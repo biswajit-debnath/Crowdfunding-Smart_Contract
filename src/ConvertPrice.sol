@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.20;
 
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/AggregatorV3Interface.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 
 library ConvertPrice {
@@ -26,7 +26,7 @@ library ConvertPrice {
                 // Install smartcontractkit/chainlink-brownie-contracts
                 // Import the AggregatorV3Interfact
             // Initialize the interface with the address
-            AggregatorV3Interface priceFeed = new AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+            AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
             // Call the function in the interface to get eth value in usd
             (,int256 usdValOfOneEth,,,) = priceFeed.latestRoundData();
         

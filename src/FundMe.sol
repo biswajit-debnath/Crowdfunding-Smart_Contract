@@ -2,20 +2,21 @@
 
 pragma solidity ^0.8.20;
 
-import {ConverPrice} from "./ConverPrice.sol";
+import {ConvertPrice} from "./ConvertPrice.sol";
 
 
 contract FundMe {
-    using ConverPrice for uint256;
-    error FundeMe__Require_More_Fund();
+    using ConvertPrice for uint256;
+    error FundMe__Require_More_Fund();
+    error FundMe__No_Funds_To_Withdraw();
     error FundMe__Only_Owner_Can_Withdraw();
     error FundMe__Withdrawal_Failed();
 
     address[] private funders;
-    mapping(address => uint256) private fundersToAmount;
-    address private i_owner;
+    mapping(address => uint256) private funderToAmount;
+    address private immutable i_owner;
 
-    const MINIMUM_AMOUNT_FUNDING_USD = 5 * 10 ** 18; // 5e18 values are handled in wei and it is e18 to 1eth
+    uint256 constant MINIMUM_AMOUNT_FUNDING_USD = 5 * 10 ** 18; // 5e18 values are handled in wei and it is e18 to 1eth
 
     constructor() {
         // Set the owner as the contract intializer
@@ -26,14 +27,14 @@ contract FundMe {
         // Minimum 5$ value of eth should be sent for qualifying
         // Follows CEI
     function fund() public payable{
-        uint256 amountSentInUsd = convertEthToUsd(this.value);
+        uint256 amountSentInUsd = msg.value.convertEthToUsd();
         // Check if correct amount is sent if not revert with custom error
         if(amountSentInUsd < MINIMUM_AMOUNT_FUNDING_USD) {
-            revert FundeMe__Require_More_Fund();
+            revert FundMe__Require_More_Fund();
         }
 
         // Keep a list of funders addresses in an array
-        funders.push(msg.sender)
+        funders.push(msg.sender);
         // Keep a mapping of funder's address to amount funded 
             // Consider the case if the same funder funds multiple time
         funderToAmount[msg.sender] += msg.value;
@@ -41,28 +42,28 @@ contract FundMe {
 
     // Withdraw all funds from contract by the owner of the contract
         // Only owner can withdraw
-    functio withdrawAllFundsFromContract() public isOwner {
+    function withdrawAllFundsFromContract() public isOwner {
         // Check if there is some balance in the contract
         if(address(this).balance == 0) {
-            revert FundMe__No_Funds_To_Withdraw;
+            revert FundMe__No_Funds_To_Withdraw();
         }
         // Empty the funders array and mapping
         for(uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++) {
             address funderAddress = funders[funderIndex];
-            fundersToAmount[funderAddress] = 0;
+            funderToAmount [funderAddress] = 0;
         }
         funders = new address[](0);
 
         // Transfer the amount from contract to owner
         (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
         if(!success) {
-            revert FundMe__Withdrawal_Failed;
+            revert FundMe__Withdrawal_Failed();
         }
     }
 
     modifier isOwner {
         if(msg.sender != i_owner) {
-            revert FundMe__Only_Owner_Can_Withdraw;
+            revert FundMe__Only_Owner_Can_Withdraw();
         }
         _;
     }
@@ -81,19 +82,19 @@ contract FundMe {
     }
 
     function getAmountFundedByFunderAddress(address funderAddress) public view returns(uint256) {
-        return fundersToAmount[funderAddress];
+        return funderToAmount [funderAddress];
     }
 
     function getOwnerAddress() public view returns(address) {
         return i_owner;
     }
 
-    function getMinimumAmountForFunding() public view returns(uint256) {
+    function getMinimumAmountForFunding() public pure returns(uint256) {
         return MINIMUM_AMOUNT_FUNDING_USD;
     }
 
-    function getPriceFeedVersion() public view return (uint256) {
-        return getPriceFeedVersionLib();
+    function getPriceFeedVersion() public view returns (uint256) {
+        return ConvertPrice.getPriceFeedVersionLib();
     }
 
 
