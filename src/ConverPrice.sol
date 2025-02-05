@@ -1,27 +1,41 @@
 // SPDX-Licence-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
+
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/AggregatorV3Interface.sol";
 
 
 library ConvertPrice {
 
 
-    function convertEthToUsd external (uint256 ethAmount) returns(uint256) {
+    function convertEthToUsd(uint256 ethAmount) internal view  returns(uint256) {
         // Get price feed contract
         // Call function to get eth value in usd
-        uint256 ethValInUsd = getEthValueInUsd();
+        uint256 usdValOfOneEth = getEthValueInUsd();
         // mutiple the eth value with current ethAmount
+        // Divided the result with 10^18 as ethAmount and usdValOfOneEth is also 10^18 and multplying both will give a result in 10^36
+        uint256 ethAmountInUsd = (ethAmount * usdValOfOneEth) / 10 ** 18;
+        return ethAmountInUsd;
     }
 
-    function getEthValueInUsd public () returns (uint256) {
+    function getEthValueInUsd() internal view returns (uint256) {
         // Get price feed contract
             // Get the contract address 
                 // 0x694AA1769357215DE4FAC081bf1f309aDC325306
             // Get the contract interface
-            // Initial the interface with the address
+                // Install smartcontractkit/chainlink-brownie-contracts
+                // Import the AggregatorV3Interfact
+            // Initialize the interface with the address
+            AggregatorV3Interface priceFeed = new AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
             // Call the function in the interface to get eth value in usd
-        // Call function to get eth value in usd
-
+            (,int256 usdValOfOneEth,,,) = priceFeed.latestRoundData();
         
+            return uint256(usdValOfOneEth * 10000000000);
+    }
+
+    function getPriceFeedVersionLib() internal view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+
+        return priceFeed.version();
     }
 }
