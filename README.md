@@ -1,17 +1,15 @@
-## Foundry
+## Simple Decentralized Crowdfunding Smart Contract
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+**People can fund this contract with a minumin amount of $5, all the funded amount will stay in the contract, the owner can only withdraw funds from the contract.**
 
-Foundry consists of:
+Primary Functions:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+-   **Fund**: Users will call this function to fund the contract, with a minimum of $5.
+-   **withdrawAllFundsFromContract**: Only owner of the contract call this funtion to withdraw all the funds from the contract.
+-   **getAmountFundedByFunderAddress(address funderAddress)**: This function can be called by anyone to get the amount funded by a funder provinding the funnder address as the parameter.
+-   **getOwnerAddress**: This gets the contract owner's address.
 
-## Documentation
 
-https://book.getfoundry.sh/
 
 ## Usage
 
@@ -27,17 +25,7 @@ $ forge build
 $ forge test
 ```
 
-### Format
 
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
 
 ### Anvil
 
@@ -48,13 +36,21 @@ $ anvil
 ### Deploy
 
 ```shell
+$ forge create src/FundMe.sol:FundMe --rpc-url <your_rpc_url> --private-key <your_private_key> --broadcast
+```
+
+```shell
 $ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
 ```
 
 ### Cast
 
 ```shell
-$ cast <subcommand>
+$ call call <contract address> "getMinimumAmountForFunding()"
+
+```
+```shell
+$ call send <contract address> "fund()" --value <value in wei> --private-key <your_private_key>
 ```
 
 ### Help
