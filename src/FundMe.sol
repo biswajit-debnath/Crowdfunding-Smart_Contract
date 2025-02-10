@@ -15,19 +15,21 @@ contract FundMe {
     address[] private funders;
     mapping(address => uint256) private funderToAmount;
     address private immutable i_owner;
+    address private immutable i_aggregatorV3Address;
 
     uint256 constant MINIMUM_AMOUNT_FUNDING_USD = 5 * 10 ** 18; // 5e18 values are handled in wei and it is e18 to 1eth
 
-    constructor() {
+    constructor(address aggregatorV3Address) {
         // Set the owner as the contract intializer
         i_owner = msg.sender;
+        i_aggregatorV3Address = aggregatorV3Address;
     }
 
     // Fund the contract by anyone
         // Minimum 5$ value of eth should be sent for qualifying
         // Follows CEI
     function fund() public payable{
-        uint256 amountSentInUsd = msg.value.convertEthToUsd();
+        uint256 amountSentInUsd = msg.value.convertEthToUsd(i_aggregatorV3Address);
         // Check if correct amount is sent if not revert with custom error
         if(amountSentInUsd < MINIMUM_AMOUNT_FUNDING_USD) {
             revert FundMe__Require_More_Fund();
@@ -94,7 +96,7 @@ contract FundMe {
     }
 
     function getPriceFeedVersion() public view returns (uint256) {
-        return ConvertPrice.getPriceFeedVersionLib();
+        return ConvertPrice.getPriceFeedVersionLib(i_aggregatorV3Address);
     }
 
 

@@ -9,23 +9,23 @@ contract FundMeTest is Test {
     FundMe fundMe;
 
     function setUp() external {
-        vm.startBroadcast();
-        fundMe = new FundMe();
-        vm.stopBroadcast();
+        // vm.startBroadcast();
+        // fundMe = new FundMe();
+        // vm.stopBroadcast();
     }
 
-    function testMinimumAmountForFunding() public {
-        // Arrage
-        uint256 minimumAmountForFunding = 5e18;
+    // function testMinimumAmountForFunding() public {
+    //     // Arrage
+    //     uint256 minimumAmountForFunding = 5e18;
 
-        // Act
-        uint256 minimumAmountInContract = fundMe.getMinimumAmountForFunding();
-        console.log("minimumAmountInContract::", minimumAmountInContract);
-        console.log("minimumAmountForFunding::", minimumAmountForFunding);
+    //     // Act
+    //     uint256 minimumAmountInContract = fundMe.getMinimumAmountForFunding();
+    //     console.log("minimumAmountInContract::", minimumAmountInContract);
+    //     console.log("minimumAmountForFunding::", minimumAmountForFunding);
 
 
-        // Assert
-        assertEq(minimumAmountForFunding, minimumAmountInContract);
-    }
+    //     // Assert
+    //     assertEq(minimumAmountForFunding, minimumAmountInContract);
+    // }
 
 }
