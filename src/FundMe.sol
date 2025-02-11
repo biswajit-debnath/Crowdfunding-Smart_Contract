@@ -87,6 +87,10 @@ contract FundMe {
         return funderToAmount [funderAddress];
     }
 
+    function getAllFunders() public returns(address[] memory)  {
+        return funders;
+    }
+
     function getOwnerAddress() public view returns(address) {
         return i_owner;
     }
